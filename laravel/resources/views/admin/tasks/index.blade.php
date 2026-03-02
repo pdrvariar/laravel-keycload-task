@@ -128,7 +128,7 @@
         <div class="modal-content">
             <div class="modal-header bg-warning text-dark">
                 <h5 class="modal-title">Editar Tarefa</h5>
-                <button type="button" class="btn-close" id="closeEditModalBtn" onclick="closeEditModalWithValidation(event)"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="editTaskForm">
@@ -156,7 +156,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cancelEditTaskBtn" onclick="closeEditModalWithValidation(event)">Cancelar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="saveEditTaskBtn">
                     <i class="bi bi-check-circle"></i> Salvar
                 </button>
@@ -382,37 +382,6 @@
         document.getElementById('confirmBatchDeleteBtn').addEventListener('click', deleteBatchTasks);
         document.getElementById('editFromViewBtn').addEventListener('click', function() {
             editTask(currentTaskId);
-        });
-
-        // Validação para impedir fechar modal de edição sem título
-        document.getElementById('closeEditModalBtn').addEventListener('click', function(e) {
-            const title = document.getElementById('editTaskTitle').value.trim();
-            if (!title) {
-                e.preventDefault();
-                e.stopPropagation();
-                const errorDiv = document.getElementById('editFormError');
-                errorDiv.textContent = 'O título é obrigatório. Por favor, informe um título para a tarefa.';
-                errorDiv.classList.remove('d-none');
-                // Scroll para o erro
-                document.getElementById('editTaskForm').scrollIntoView({ behavior: 'smooth' });
-                return false;
-            }
-            editTaskModal.hide();
-        });
-
-        document.getElementById('cancelEditTaskBtn').addEventListener('click', function(e) {
-            const title = document.getElementById('editTaskTitle').value.trim();
-            if (!title) {
-                e.preventDefault();
-                e.stopPropagation();
-                const errorDiv = document.getElementById('editFormError');
-                errorDiv.textContent = 'O título é obrigatório. Por favor, informe um título para a tarefa.';
-                errorDiv.classList.remove('d-none');
-                // Scroll para o erro
-                document.getElementById('editTaskForm').scrollIntoView({ behavior: 'smooth' });
-                return false;
-            }
-            editTaskModal.hide();
         });
     });
 

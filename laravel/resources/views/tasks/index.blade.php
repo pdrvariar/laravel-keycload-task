@@ -515,6 +515,11 @@
         const description = document.getElementById('taskDescription').value.trim();
         const status = document.getElementById('taskStatus').value;
 
+        if (!title) {
+            showFormError('Por favor, informe um título');
+            return;
+        }
+
         if (!description) {
             showFormError('Por favor, informe uma descrição');
             return;
