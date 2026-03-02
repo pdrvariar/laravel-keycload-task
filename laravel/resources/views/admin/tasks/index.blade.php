@@ -128,22 +128,23 @@
         <div class="modal-content">
             <div class="modal-header bg-warning text-dark">
                 <h5 class="modal-title">Editar Tarefa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" id="closeEditModalBtn" onclick="closeEditModalWithValidation(event)"></button>
             </div>
             <div class="modal-body">
                 <form id="editTaskForm">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Título</label>
-                        <input type="text" class="form-control" id="editTaskTitle" maxlength="255">
+                        <label class="form-label fw-bold">Título <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editTaskTitle" maxlength="255" required>
+                        <small class="text-muted">Obrigatório - Informe um título claro para a tarefa</small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Descrição</label>
-                        <textarea class="form-control" id="editTaskDescription" rows="4" maxlength="1000"></textarea>
+                        <label class="form-label fw-bold">Descrição <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="editTaskDescription" rows="4" maxlength="1000" required></textarea>
                         <small class="text-muted">Máximo 1000 caracteres</small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Status</label>
-                        <select class="form-select" id="editTaskStatus">
+                        <label class="form-label fw-bold">Status <span class="text-danger">*</span></label>
+                        <select class="form-select" id="editTaskStatus" required>
                             <option value="Em Planejamento">Em Planejamento</option>
                             <option value="Em Andamento">Em Andamento</option>
                             <option value="Concluído">Concluído</option>
@@ -155,7 +156,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary" id="cancelEditTaskBtn" onclick="closeEditModalWithValidation(event)">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="saveEditTaskBtn">
                     <i class="bi bi-check-circle"></i> Salvar
                 </button>
@@ -196,12 +197,14 @@
             <div class="modal-body">
                 <p>Deseja criar uma cópia desta tarefa?</p>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Novo Título</label>
-                    <input type="text" class="form-control" id="cloneTaskTitle" maxlength="255">
+                    <label class="form-label fw-bold">Novo Título <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="cloneTaskTitle" maxlength="255" required>
+                    <small class="text-muted">Obrigatório - Informe um título para a tarefa clonada</small>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Nova Descrição</label>
-                    <textarea class="form-control" id="cloneTaskDescription" rows="3"></textarea>
+                    <label class="form-label fw-bold">Nova Descrição <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="cloneTaskDescription" rows="3" required></textarea>
+                    <small class="text-muted">Obrigatório</small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -379,6 +382,37 @@
         document.getElementById('confirmBatchDeleteBtn').addEventListener('click', deleteBatchTasks);
         document.getElementById('editFromViewBtn').addEventListener('click', function() {
             editTask(currentTaskId);
+        });
+
+        // Validação para impedir fechar modal de edição sem título
+        document.getElementById('closeEditModalBtn').addEventListener('click', function(e) {
+            const title = document.getElementById('editTaskTitle').value.trim();
+            if (!title) {
+                e.preventDefault();
+                e.stopPropagation();
+                const errorDiv = document.getElementById('editFormError');
+                errorDiv.textContent = 'O título é obrigatório. Por favor, informe um título para a tarefa.';
+                errorDiv.classList.remove('d-none');
+                // Scroll para o erro
+                document.getElementById('editTaskForm').scrollIntoView({ behavior: 'smooth' });
+                return false;
+            }
+            editTaskModal.hide();
+        });
+
+        document.getElementById('cancelEditTaskBtn').addEventListener('click', function(e) {
+            const title = document.getElementById('editTaskTitle').value.trim();
+            if (!title) {
+                e.preventDefault();
+                e.stopPropagation();
+                const errorDiv = document.getElementById('editFormError');
+                errorDiv.textContent = 'O título é obrigatório. Por favor, informe um título para a tarefa.';
+                errorDiv.classList.remove('d-none');
+                // Scroll para o erro
+                document.getElementById('editTaskForm').scrollIntoView({ behavior: 'smooth' });
+                return false;
+            }
+            editTaskModal.hide();
         });
     });
 
@@ -744,10 +778,30 @@
         const status = document.getElementById('editTaskStatus').value;
         const errorDiv = document.getElementById('editFormError');
 
+        // Limpar erro anterior
+        errorDiv.classList.add('d-none');
+
+        // Validações locais
+        if (!title) {
+            errorDiv.textContent = 'O título é obrigatório. Por favor, informe um título para a tarefa.';
+            errorDiv.classList.remove('d-none');
+            // Scroll para o erro
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;  // Retornar false para garantir que não continua
+        }
+
+        if (title.length > 255) {
+            errorDiv.textContent = 'O título não pode exceder 255 caracteres';
+            errorDiv.classList.remove('d-none');
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+
         if (!description) {
             errorDiv.textContent = 'Por favor, informe uma descrição';
             errorDiv.classList.remove('d-none');
-            return;
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
         }
 
         const btn = document.getElementById('saveEditTaskBtn');
@@ -774,23 +828,35 @@
                 btn.innerHTML = '<i class="bi bi-check-circle"></i> Salvar';
 
                 if (data.success) {
+                    // Sucesso - fechar modal
                     editTaskModal.hide();
                     loadTasks();
                     showSuccess(data.message);
                 } else {
-                    errorDiv.textContent = data.message;
+                    // Erro - MANTER modal aberto
+                    if (data.errors) {
+                        const errorMessages = Object.values(data.errors).flat().join(', ');
+                        errorDiv.textContent = errorMessages;
+                    } else {
+                        errorDiv.textContent = data.message;
+                    }
                     errorDiv.classList.remove('d-none');
+                    // Scroll para o erro
+                    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             })
             .catch(error => {
                 console.error('Erro:', error);
-                errorDiv.textContent = 'Erro ao salvar tarefa: ' + error.message;
-                errorDiv.classList.remove('d-none');
-
-                // Reset button state on error
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-check-circle"></i> Salvar';
+
+                errorDiv.textContent = 'Erro ao salvar tarefa: ' + error.message;
+                errorDiv.classList.remove('d-none');
+                // Scroll para o erro
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
+
+        return false;  // Previne qualquer propagação
     }
 
     function confirmDelete(taskId) {
@@ -846,6 +912,16 @@
         const description = document.getElementById('cloneTaskDescription').value.trim();
         const btn = document.getElementById('confirmCloneBtn');
 
+        if (!title) {
+            alert('O título é obrigatório. Por favor, informe um título para a tarefa clonada.');
+            return;
+        }
+
+        if (title.length > 255) {
+            alert('O título não pode exceder 255 caracteres');
+            return;
+        }
+
         if (!description) {
             alert('Por favor, informe uma descrição');
             return;
@@ -874,7 +950,13 @@
                     loadTasks();
                     showSuccess('Tarefa clonada com sucesso!');
                 } else {
-                    showError(data.message);
+                    // Tratando erros de validação da API
+                    if (data.errors) {
+                        const errorMessages = Object.values(data.errors).flat().join(', ');
+                        showError(errorMessages);
+                    } else {
+                        showError(data.message);
+                    }
                 }
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-copy"></i> Clonar';

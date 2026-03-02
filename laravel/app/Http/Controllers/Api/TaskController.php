@@ -146,14 +146,21 @@ class TaskController extends Controller
             }
 
             $validated = $request->validate([
-                'title' => 'nullable|string|max:255',
+                'title' => 'required|string|max:255',
                 'description' => 'required|string|max:1000',
                 'status' => 'nullable|in:Em Planejamento,Em Andamento,Concluído,Pausado,Cancelado',
+            ], [
+                'title.required' => 'O título é obrigatório. Por favor, informe um título para a tarefa.',
+                'title.string' => 'O título deve ser um texto válido.',
+                'title.max' => 'O título não pode exceder 255 caracteres.',
+                'description.required' => 'A descrição é obrigatória.',
+                'description.string' => 'A descrição deve ser um texto válido.',
+                'description.max' => 'A descrição não pode exceder 1000 caracteres.',
             ]);
 
             $task = Task::create([
                 'user_id' => $user->id,
-                'title' => $validated['title'] ?? '(SEM TITULO)',
+                'title' => $validated['title'],
                 'description' => $validated['description'],
                 'status' => $validated['status'] ?? 'Em Planejamento',
             ]);
@@ -206,9 +213,17 @@ class TaskController extends Controller
             }
 
             $validated = $request->validate([
-                'title' => 'nullable|string|max:255',
+                'title' => 'required|string|max:255',
                 'description' => 'required|string|max:1000',
                 'status' => 'required|in:Em Planejamento,Em Andamento,Concluído,Pausado,Cancelado',
+            ], [
+                'title.required' => 'O título é obrigatório. Por favor, informe um título para a tarefa.',
+                'title.string' => 'O título deve ser um texto válido.',
+                'title.max' => 'O título não pode exceder 255 caracteres.',
+                'description.required' => 'A descrição é obrigatória.',
+                'description.string' => 'A descrição deve ser um texto válido.',
+                'description.max' => 'A descrição não pode exceder 1000 caracteres.',
+                'status.required' => 'O status é obrigatório.',
             ]);
 
             $task->update($validated);

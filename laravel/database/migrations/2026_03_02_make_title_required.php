@@ -12,12 +12,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tasks', function (Blueprint $table) {
-            $table->string('title', 255)->nullable()->default(null)->after('user_id');
-        });
+        // Primeiro, garantir que nenhum título seja nulo ou vazio
+        DB::table('tasks')
+            ->whereNull('title')
+            ->orWhere('title', '')
+            ->orWhere('title', '(SEM TITULO)')
+            ->update(['title' => 'Sem Titulo - Corrigir']);
 
-        // Atualizar tarefas existentes com o título padrão se estiverem vazias
-        DB::table('tasks')->whereNull('title')->orWhere('title', '')->update(['title' => 'Sem Titulo - Corrigir']);
+        // Agora tornar o campo NOT NULL
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->string('title', 255)->nullable(false)->change();
+        });
     }
 
     /**
@@ -26,7 +31,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->dropColumn('title');
+            $table->string('title', 255)->nullable()->change();
         });
     }
 };

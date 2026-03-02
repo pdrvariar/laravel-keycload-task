@@ -24,6 +24,7 @@
                 <div style="margin-bottom: 2rem;">
                     <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; font-size: 0.95rem;">
                         <i class="bi bi-bookmark"></i> Título da Tarefa
+                        <span style="color: #ef4444;">*</span>
                     </label>
                     <input
                         type="text"
@@ -31,11 +32,12 @@
                         name="title"
                         placeholder="Digite o título da tarefa..."
                         maxlength="255"
+                        required
                         style="width: 100%; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; font-family: inherit; transition: all 0.3s ease;"
                         onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
                         onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'"
                     />
-                    <p style="color: #64748b; font-size: 0.85rem; margin-top: 0.5rem; margin-bottom: 0;">Opcional - Se deixar em branco, será definido como "(SEM TITULO)"</p>
+                    <p style="color: #64748b; font-size: 0.85rem; margin-top: 0.5rem; margin-bottom: 0;">Obrigatório - Informe um título claro para sua tarefa</p>
                 </div>
 
                 <!-- Descrição -->
@@ -158,6 +160,17 @@
             const description = document.getElementById('description').value;
             const status = document.getElementById('status').value;
 
+            // Validação do título
+            if (!title) {
+                showError('O título é obrigatório. Por favor, informe um título para a tarefa.');
+                return;
+            }
+
+            if (title.length > 255) {
+                showError('O título não pode exceder 255 caracteres.');
+                return;
+            }
+
             if (!description || !status) {
                 showError('Preencha todos os campos obrigatórios');
                 return;
@@ -173,7 +186,7 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
                     },
                     body: JSON.stringify({
-                        title: title || '(SEM TITULO)',
+                        title: title,
                         description,
                         status
                     })
@@ -184,6 +197,11 @@
                 if (!response.ok) {
                     if (response.status === 401) {
                         throw new Error('Sua sessão expirou. Por favor, faça login novamente.');
+                    }
+                    // Tratando erros de validação da API
+                    if (data.errors) {
+                        const errorMessages = Object.values(data.errors).flat().join(', ');
+                        throw new Error(errorMessages);
                     }
                     throw new Error(data.message || 'Erro ao criar tarefa');
                 }
