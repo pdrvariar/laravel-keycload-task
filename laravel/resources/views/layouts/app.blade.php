@@ -50,7 +50,7 @@
         .modern-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 1.5rem 2rem;
+            padding: 0.8rem 2rem;
             box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
             position: sticky;
             top: 0;
@@ -208,6 +208,7 @@
             overflow-y: auto;
             z-index: 999;
             box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
+            transition: left 0.3s ease;
         }
 
         .sidebar-menu {
@@ -477,8 +478,33 @@
             color: #991b1b;
         }
 
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex;
+            }
+
             .sidebar {
                 position: fixed;
                 left: -280px;
@@ -488,7 +514,7 @@
             }
 
             .sidebar.active {
-                left: 0;
+                left: 0 !important;
             }
 
             .main-content {
@@ -497,6 +523,10 @@
 
             .dashboard-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .header-brand-icon {
+                display: none;
             }
 
             .header-brand-text h1 {
@@ -550,25 +580,40 @@
     @include('partials.footer')
 
     <script>
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
             });
-        });
 
-        // Mobile sidebar toggle
-        const toggleSidebar = document.getElementById('toggleSidebar');
-        const sidebar = document.querySelector('.sidebar');
-        if (toggleSidebar) {
-            toggleSidebar.addEventListener('click', () => {
-                sidebar?.classList.toggle('active');
-            });
-        }
+            // Mobile sidebar toggle
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const sidebar = document.querySelector('.sidebar');
+
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sidebar.classList.toggle('active');
+                });
+
+                // Close sidebar when clicking outside on mobile
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768 &&
+                        sidebar.classList.contains('active') &&
+                        !sidebar.contains(e.target) &&
+                        !toggleBtn.contains(e.target)) {
+                        sidebar.classList.remove('active');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

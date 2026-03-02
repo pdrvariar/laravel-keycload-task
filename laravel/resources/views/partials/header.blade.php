@@ -1,24 +1,31 @@
 <!-- Header Moderno -->
 <div class="modern-header">
     <div class="header-content">
-        <!-- Logo e Título -->
-        <?php
-            $clientId = config('keycloak.client_id', 'task-app');
-            $keycloakUser = session('keycloak_user', []);
-            $clientRoles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
-            $realmRoles = $keycloakUser['realm_access']['roles'] ?? [];
-            $allRoles = array_merge($clientRoles, $realmRoles);
-        ?>
-        <a href="{{ auth()->check() && in_array('admin', $allRoles) ? route('admin.dashboard') : route('dashboard') }}"
-           class="header-brand" style="text-decoration: none; color: inherit; cursor: pointer;">
-            <div class="header-brand-icon">
-                <i class="bi bi-list-check"></i>
-            </div>
-            <div class="header-brand-text">
-                <h1>Task Controller</h1>
-                <p>Rattes Factory</p>
-            </div>
-        </a>
+        <div class="d-flex align-items-center">
+            <!-- Menu Mobile Toggle -->
+            <button id="toggleSidebar" class="mobile-menu-btn" type="button">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <!-- Logo e Título -->
+            <?php
+                $clientId = config('keycloak.client_id', 'task-app');
+                $keycloakUser = session('keycloak_user', []);
+                $clientRoles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
+                $realmRoles = $keycloakUser['realm_access']['roles'] ?? [];
+                $allRoles = array_merge($clientRoles, $realmRoles);
+            ?>
+            <a href="{{ auth()->check() && in_array('admin', $allRoles) ? route('admin.dashboard') : route('dashboard') }}"
+               class="header-brand" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <div class="header-brand-icon">
+                    <i class="bi bi-list-check"></i>
+                </div>
+                <div class="header-brand-text">
+                    <h1>Task Controller</h1>
+                    <p>Rattes Factory</p>
+                </div>
+            </a>
+        </div>
 
         <!-- Informações do Usuário e Logout -->
         <div class="header-user">
