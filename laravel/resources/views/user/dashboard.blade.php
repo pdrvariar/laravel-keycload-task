@@ -16,7 +16,7 @@
         <!-- Grid de Cards Estratégicos -->
         <div class="dashboard-grid">
             <!-- Card: Total de Tarefas -->
-            <div class="card-modern">
+            <div class="card-modern" style="cursor: pointer; transition: all 0.3s ease;" onclick="goToTasks('')" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(102, 126, 234, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)'">
                 <div class="card-header">
                     <div>
                         <h3 class="card-title">Minhas Tarefas</h3>
@@ -33,7 +33,7 @@
             </div>
 
             <!-- Card: Tarefas em Andamento -->
-            <div class="card-modern">
+            <div class="card-modern" style="cursor: pointer; transition: all 0.3s ease;" onclick="goToTasks('Em Andamento')" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(102, 126, 234, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)'">
                 <div class="card-header">
                     <div>
                         <h3 class="card-title">Em Andamento</h3>
@@ -50,7 +50,7 @@
             </div>
 
             <!-- Card: Tarefas Concluídas -->
-            <div class="card-modern">
+            <div class="card-modern" style="cursor: pointer; transition: all 0.3s ease;" onclick="goToTasks('Concluído')" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(102, 126, 234, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)'">
                 <div class="card-header">
                     <div>
                         <h3 class="card-title">Concluídas</h3>
@@ -334,5 +334,16 @@
 
         // Recarregar a cada 30 segundos
         setInterval(loadTasks, 30000);
+
+        // Função para redirecionar para a página de tasks com filtro
+        function goToTasks(status) {
+            if (status === '') {
+                // Minhas Tarefas - sem filtro
+                window.location.href = '{{ route("tasks.index") }}';
+            } else {
+                // Com filtro de status
+                window.location.href = '{{ route("tasks.index") }}?filter=' + encodeURIComponent(status);
+            }
+        }
     </script>
 @endsection

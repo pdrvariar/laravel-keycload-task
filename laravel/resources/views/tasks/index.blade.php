@@ -308,7 +308,23 @@
             return;
         }
 
-        console.log('3. Iniciando carregamento de tarefas...');
+        console.log('3. Verificando parâmetros da URL...');
+        const urlParams = new URLSearchParams(window.location.search);
+        const filterParam = urlParams.get('filter');
+
+        if (filterParam) {
+            console.log('   ✓ Filtro encontrado na URL:', filterParam);
+            // Aplicar filtro automaticamente
+            const filterSelect = document.getElementById('filterStatus');
+            if (filterSelect) {
+                filterSelect.value = filterParam;
+                console.log('   ✓ Filtro aplicado ao select');
+            }
+        } else {
+            console.log('   - Nenhum filtro na URL');
+        }
+
+        console.log('4. Iniciando carregamento de tarefas...');
         console.groupEnd();
         loadTasks();
 
