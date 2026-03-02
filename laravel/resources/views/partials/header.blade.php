@@ -1,6 +1,6 @@
 <!-- Header Moderno -->
 <div class="modern-header">
-    <div class="header-content">
+    <div class="header-content" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
         <div class="d-flex align-items-center">
             <!-- Menu Mobile Toggle -->
             <button id="toggleSidebar" class="mobile-menu-btn" type="button">
@@ -16,7 +16,7 @@
                 $allRoles = array_merge($clientRoles, $realmRoles);
             ?>
             <a href="{{ auth()->check() && in_array('admin', $allRoles) ? route('admin.dashboard') : route('dashboard') }}"
-               class="header-brand" style="text-decoration: none; color: inherit; cursor: pointer;">
+               class="header-brand" style="text-decoration: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 1rem;">
                 <div class="header-brand-icon">
                     <i class="bi bi-list-check"></i>
                 </div>
@@ -28,8 +28,8 @@
         </div>
 
         <!-- Informações do Usuário e Logout -->
-        <div class="header-user">
-            <div class="user-info">
+        <div class="header-user" style="display: flex; align-items: center; gap: 1.5rem; margin-left: auto;">
+            <div class="user-info" style="display: flex; align-items: center; gap: 0.75rem;">
                 <div class="user-avatar">
                     {{ substr(session('keycloak_user.name') ?? 'U', 0, 1) }}
                 </div>

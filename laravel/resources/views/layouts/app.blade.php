@@ -62,9 +62,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
             width: 100%;
+            margin: 0 auto;
         }
 
         .header-brand {
@@ -107,6 +106,7 @@
             display: flex;
             align-items: center;
             gap: 1.5rem;
+            margin-left: auto;
         }
 
         .user-info {
