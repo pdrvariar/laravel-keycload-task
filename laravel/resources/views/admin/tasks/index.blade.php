@@ -38,6 +38,7 @@
                     <select class="form-select form-select-sm" id="sortBy">
                         <option value="created_at">Data (Mais Recentes)</option>
                         <option value="created_at_asc">Data (Mais Antigos)</option>
+                        <option value="title">Título (A-Z)</option>
                         <option value="description">Descrição (A-Z)</option>
                     </select>
                 </div>
@@ -71,11 +72,15 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="viewTaskTitle">Detalhes da Tarefa</h5>
+                <h5 class="modal-title" id="viewTaskTitleHeader">Detalhes da Tarefa</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="row mb-3">
+                    <div class="col-12 mb-3">
+                        <label class="form-label text-muted small">Título</label>
+                        <h4 id="viewTaskTitleContent" class="fw-bold"></h4>
+                    </div>
                     <div class="col-md-8">
                         <label class="form-label text-muted small">Descrição</label>
                         <p class="text-wrap" id="viewTaskDescription"></p>
@@ -128,6 +133,10 @@
             <div class="modal-body">
                 <form id="editTaskForm">
                     <div class="mb-3">
+                        <label class="form-label fw-bold">Título</label>
+                        <input type="text" class="form-control" id="editTaskTitle" maxlength="255">
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label fw-bold">Descrição</label>
                         <textarea class="form-control" id="editTaskDescription" rows="4" maxlength="1000"></textarea>
                         <small class="text-muted">Máximo 1000 caracteres</small>
@@ -170,6 +179,57 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
                     <i class="bi bi-trash"></i> Deletar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Clonar Tarefa -->
+<div class="modal fade" id="cloneModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Clonar Tarefa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja criar uma cópia desta tarefa?</p>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Novo Título</label>
+                    <input type="text" class="form-control" id="cloneTaskTitle" maxlength="255">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nova Descrição</label>
+                    <textarea class="form-control" id="cloneTaskDescription" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-info text-white" id="confirmCloneBtn">
+                    <i class="bi bi-copy"></i> Clonar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Exclusão em Lote -->
+<div class="modal fade" id="batchDeleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Exclusão em Lote</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja deletar <span id="batchCount">0</span> tarefas selecionadas?</p>
+                <p class="text-danger fw-bold">Esta ação não pode ser desfeita!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmBatchDeleteBtn">
+                    <i class="bi bi-trash"></i> Deletar Selecionadas
                 </button>
             </div>
         </div>
@@ -246,7 +306,40 @@
         color: #dee2e6;
         margin-bottom: 1rem;
     }
+
+    /* Datatable Customization */
+    .dataTables_wrapper .dataTables_length select {
+        padding-right: 2rem !important;
+    }
+
+    .action-icon {
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .action-icon:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+
+    .selected-row {
+        background-color: rgba(13, 110, 253, 0.05) !important;
+    }
 </style>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap5.min.css">
+
+<!-- DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
 
 <script>
     const API_URL = '/api/tasks';
@@ -262,13 +355,16 @@
     }
 
     let currentTaskId = null;
-    let viewTaskModal, editTaskModal, deleteModal;
+    let viewTaskModal, editTaskModal, deleteModal, cloneModal, batchDeleteModal;
     let allTasks = [];
+    let dataTable = null;
 
     document.addEventListener('DOMContentLoaded', function() {
         viewTaskModal = new bootstrap.Modal(document.getElementById('viewTaskModal'));
         editTaskModal = new bootstrap.Modal(document.getElementById('editTaskModal'));
         deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        cloneModal = new bootstrap.Modal(document.getElementById('cloneModal'));
+        batchDeleteModal = new bootstrap.Modal(document.getElementById('batchDeleteModal'));
 
         loadUsers();
         loadTasks();
@@ -279,14 +375,27 @@
         document.getElementById('sortBy').addEventListener('change', loadTasks);
         document.getElementById('saveEditTaskBtn').addEventListener('click', saveEditTask);
         document.getElementById('confirmDeleteBtn').addEventListener('click', deleteTask);
+        document.getElementById('confirmCloneBtn').addEventListener('click', cloneTask);
+        document.getElementById('confirmBatchDeleteBtn').addEventListener('click', deleteBatchTasks);
+        document.getElementById('editFromViewBtn').addEventListener('click', function() {
+            editTask(currentTaskId);
+        });
     });
 
     function loadUsers() {
-        fetch(USERS_URL)
+        fetch(USERS_URL, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     const select = document.getElementById('filterUser');
+                    // Limpar opções existentes exceto a primeira
+                    while (select.options.length > 1) {
+                        select.remove(1);
+                    }
                     data.data.forEach(user => {
                         const option = document.createElement('option');
                         option.value = user.id;
@@ -316,22 +425,40 @@
         } else if (sortBy === 'description') {
             params.append('sort_by', 'description');
             params.append('sort_order', 'asc');
+        } else if (sortBy === 'title') {
+            params.append('sort_by', 'title');
+            params.append('sort_order', 'asc');
         }
 
-        fetch(`${API_URL}?${params}`)
+        // Show loading state
+        const container = document.getElementById('tasksTableContainer');
+        container.innerHTML = `
+            <div class="text-center p-4">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2">Carregando tarefas...</p>
+            </div>
+        `;
+
+        fetch(`${API_URL}?${params}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     allTasks = data.data;
                     renderStats(allTasks);
-                    renderTasks(allTasks);
+                    initDataTable(allTasks);
                 } else {
-                    showError('Erro ao carregar tarefas');
+                    showError('Erro ao carregar tarefas: ' + (data.message || 'Erro desconhecido'));
                 }
             })
             .catch(error => {
                 console.error('Erro:', error);
-                showError('Erro ao carregar tarefas');
+                showError('Erro ao carregar tarefas. Verifique sua conexão.');
             });
     }
 
@@ -387,8 +514,14 @@
         document.getElementById('statsContainer').innerHTML = html;
     }
 
-    function renderTasks(tasks) {
+    function initDataTable(tasks) {
         const container = document.getElementById('tasksTableContainer');
+
+        // Destroy existing table if any
+        if (dataTable) {
+            dataTable.destroy();
+            dataTable = null;
+        }
 
         if (tasks.length === 0) {
             container.innerHTML = `
@@ -402,17 +535,23 @@
         }
 
         let html = `
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 40%;">Descrição</th>
-                        <th style="width: 20%;">Usuário</th>
-                        <th style="width: 15%;">Status</th>
-                        <th style="width: 15%;">Data</th>
-                        <th style="width: 10%; text-align: center;">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <div class="p-3">
+                <button id="btnBatchDelete" class="btn btn-danger btn-sm mb-3 d-none">
+                    <i class="bi bi-trash"></i> Excluir Selecionados (<span id="selectedCount">0</span>)
+                </button>
+                <table id="tasksTable" class="table table-hover dt-responsive nowrap" style="width:100%">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 5%;"><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                            <th style="width: 20%;">Título</th>
+                            <th style="width: 25%;">Descrição</th>
+                            <th style="width: 15%;">Usuário</th>
+                            <th style="width: 10%;">Status</th>
+                            <th style="width: 15%;">Data</th>
+                            <th style="width: 10%; text-align: center;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
         `;
 
         tasks.forEach(task => {
@@ -420,46 +559,139 @@
             const date = new Date(task.created_at).toLocaleDateString('pt-BR', {
                 day: '2-digit',
                 month: '2-digit',
-                year: '2-digit'
+                year: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
             });
 
             html += `
-                <tr onclick="viewTask(${task.id})">
+                <tr data-id="${task.id}">
+                    <td><input type="checkbox" class="form-check-input task-checkbox" value="${task.id}"></td>
                     <td>
-                        <strong>${escapeHtml(task.description.substring(0, 50))}</strong>
-                        ${task.description.length > 50 ? '...' : ''}
+                        <div class="d-flex align-items-center">
+                            <span class="text-truncate fw-bold" style="max-width: 200px;" title="${escapeHtml(task.title)}">
+                                ${escapeHtml(task.title || '(Sem Título)')}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="text-truncate" style="max-width: 300px;" title="${escapeHtml(task.description)}">
+                                ${escapeHtml(task.description)}
+                            </span>
+                        </div>
                     </td>
                     <td>${escapeHtml(task.user?.name || 'Desconhecido')}</td>
                     <td>
                         <span class="status-badge ${statusClass}">${task.status}</span>
                     </td>
                     <td>${date}</td>
-                    <td>
-                        <div class="btn-group btn-group-sm" role="group" onclick="event.stopPropagation();">
-                            <button type="button" class="btn btn-outline-primary" onclick="editTask(${task.id})">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-danger" onclick="confirmDelete(${task.id})">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
+                    <td class="text-center">
+                        <i class="bi bi-eye text-primary action-icon me-2" onclick="viewTask(${task.id})" title="Visualizar"></i>
+                        <i class="bi bi-pencil text-warning action-icon me-2" onclick="editTask(${task.id})" title="Editar"></i>
+                        <i class="bi bi-copy text-info action-icon me-2" onclick="confirmClone(${task.id})" title="Clonar"></i>
+                        <i class="bi bi-trash text-danger action-icon" onclick="confirmDelete(${task.id})" title="Excluir"></i>
                     </td>
                 </tr>
             `;
         });
 
         html += `
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         `;
 
         container.innerHTML = html;
+
+        // Initialize DataTable
+        dataTable = $('#tasksTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
+            },
+            responsive: true,
+            order: [[5, 'desc']], // Sort by date by default (index 5 now)
+            columnDefs: [
+                { orderable: false, targets: [0, 6] } // Disable sorting for checkbox and actions
+            ],
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]]
+        });
+
+        // Checkbox handling
+        $('#selectAll').on('change', function() {
+            const isChecked = $(this).is(':checked');
+            $('.task-checkbox').prop('checked', isChecked);
+            updateBatchDeleteButton();
+        });
+
+        $(document).on('change', '.task-checkbox', function() {
+            updateBatchDeleteButton();
+
+            // Update "Select All" checkbox state
+            const allChecked = $('.task-checkbox:checked').length === $('.task-checkbox').length;
+            $('#selectAll').prop('checked', allChecked);
+        });
+    }
+
+    function updateBatchDeleteButton() {
+        const selectedCount = $('.task-checkbox:checked').length;
+        const btn = $('#btnBatchDelete');
+        const countSpan = $('#selectedCount');
+
+        countSpan.text(selectedCount);
+
+        if (selectedCount > 0) {
+            btn.removeClass('d-none');
+        } else {
+            btn.addClass('d-none');
+        }
+    }
+
+    function deleteBatchTasks() {
+        const selectedIds = [];
+        $('.task-checkbox:checked').each(function() {
+            selectedIds.push($(this).val());
+        });
+
+        if (selectedIds.length === 0) return;
+
+        const btn = document.getElementById('confirmBatchDeleteBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deletando...';
+
+        // Process deletions sequentially or in parallel
+        const promises = selectedIds.map(id => {
+            return fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                }
+            });
+        });
+
+        Promise.all(promises)
+            .then(responses => {
+                batchDeleteModal.hide();
+                loadTasks();
+                showSuccess(`${selectedIds.length} tarefas excluídas com sucesso!`);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-trash"></i> Deletar Selecionadas';
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-trash"></i> Deletar Selecionadas';
+                showError('Erro ao deletar algumas tarefas');
+            });
     }
 
     function viewTask(taskId) {
         const task = allTasks.find(t => t.id === taskId);
         if (!task) return;
 
+        document.getElementById('viewTaskTitleContent').textContent = task.title || '(Sem Título)';
         document.getElementById('viewTaskDescription').textContent = task.description;
         document.getElementById('viewTaskStatus').innerHTML = `<span class="status-badge ${getStatusBadgeClass(task.status)}">${task.status}</span>`;
         document.getElementById('viewTaskUser').textContent = task.user?.name || 'Desconhecido';
@@ -492,15 +724,22 @@
         const task = allTasks.find(t => t.id === taskId);
         if (!task) return;
 
+        document.getElementById('editTaskTitle').value = task.title || '';
         document.getElementById('editTaskDescription').value = task.description;
         document.getElementById('editTaskStatus').value = task.status;
         document.getElementById('editFormError').classList.add('d-none');
+
+        // Reset button state
+        const btn = document.getElementById('saveEditTaskBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-circle"></i> Salvar';
 
         viewTaskModal.hide();
         editTaskModal.show();
     }
 
     function saveEditTask() {
+        const title = document.getElementById('editTaskTitle').value.trim();
         const description = document.getElementById('editTaskDescription').value.trim();
         const status = document.getElementById('editTaskStatus').value;
         const errorDiv = document.getElementById('editFormError');
@@ -523,12 +762,17 @@
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
             },
             body: JSON.stringify({
+                title: title,
                 description: description,
                 status: status
             })
         })
             .then(response => response.json())
             .then(data => {
+                // Always reset button state
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle"></i> Salvar';
+
                 if (data.success) {
                     editTaskModal.hide();
                     loadTasks();
@@ -536,14 +780,14 @@
                 } else {
                     errorDiv.textContent = data.message;
                     errorDiv.classList.remove('d-none');
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-check-circle"></i> Salvar';
                 }
             })
             .catch(error => {
                 console.error('Erro:', error);
-                errorDiv.textContent = 'Erro ao salvar tarefa';
+                errorDiv.textContent = 'Erro ao salvar tarefa: ' + error.message;
                 errorDiv.classList.remove('d-none');
+
+                // Reset button state on error
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-check-circle"></i> Salvar';
             });
@@ -587,6 +831,69 @@
             });
     }
 
+    function confirmClone(taskId) {
+        currentTaskId = taskId;
+        const task = allTasks.find(t => t.id === taskId);
+        if (!task) return;
+
+        document.getElementById('cloneTaskTitle').value = (task.title || 'Tarefa') + ' (Cópia)';
+        document.getElementById('cloneTaskDescription').value = task.description;
+        cloneModal.show();
+    }
+
+    function cloneTask() {
+        const title = document.getElementById('cloneTaskTitle').value.trim();
+        const description = document.getElementById('cloneTaskDescription').value.trim();
+        const btn = document.getElementById('confirmCloneBtn');
+
+        if (!description) {
+            alert('Por favor, informe uma descrição');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Clonando...';
+
+        fetch(`${API_URL}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify({
+                title: title,
+                description: description,
+                status: 'Em Planejamento'
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    cloneModal.hide();
+                    loadTasks();
+                    showSuccess('Tarefa clonada com sucesso!');
+                } else {
+                    showError(data.message);
+                }
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-copy"></i> Clonar';
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-copy"></i> Clonar';
+                showError('Erro ao clonar tarefa');
+            });
+    }
+
+    // Batch delete trigger
+    document.getElementById('btnBatchDelete').addEventListener('click', function() {
+        const count = $('.task-checkbox:checked').length;
+        document.getElementById('batchCount').textContent = count;
+        batchDeleteModal.show();
+    });
+
     function getStatusBadgeClass(status) {
         const map = {
             'Em Planejamento': 'em-planejamento',
@@ -601,26 +908,35 @@
     function showError(message) {
         const alert = document.createElement('div');
         alert.className = 'alert alert-danger alert-dismissible fade show';
+        alert.style.position = 'fixed';
+        alert.style.top = '20px';
+        alert.style.right = '20px';
+        alert.style.zIndex = '9999';
         alert.innerHTML = `
             <i class="bi bi-exclamation-circle"></i> ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        document.body.insertBefore(alert, document.body.firstChild);
+        document.body.appendChild(alert);
         setTimeout(() => alert.remove(), 5000);
     }
 
     function showSuccess(message) {
         const alert = document.createElement('div');
         alert.className = 'alert alert-success alert-dismissible fade show';
+        alert.style.position = 'fixed';
+        alert.style.top = '20px';
+        alert.style.right = '20px';
+        alert.style.zIndex = '9999';
         alert.innerHTML = `
             <i class="bi bi-check-circle"></i> ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        document.body.insertBefore(alert, document.body.firstChild);
+        document.body.appendChild(alert);
         setTimeout(() => alert.remove(), 5000);
     }
 
     function escapeHtml(text) {
+        if (!text) return '';
         const map = {
             '&': '&amp;',
             '<': '&lt;',
@@ -632,4 +948,3 @@
     }
 </script>
 @endsection
-
