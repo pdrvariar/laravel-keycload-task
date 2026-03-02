@@ -1,0 +1,108 @@
+version: '3.8'
+
+networks:
+  task-network:
+    driver: bridge
+
+services:
+  # MySQL for Laravel
+  mysql:
+    image: mysql:8.0
+    container_name: task_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: taskcontroller
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - task-network
+
+  # MySQL for Keycloak (use a different database)
+  keycloak-mysql:
+    image: mysql:8.0
+    container_name: task_keycloak_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3307:3306"        # different port to avoid conflict
+    volumes:
+      - keycloak_mysql_data:/var/lib/mysql
+    networks:
+      - task-network
+
+  # Keycloak
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: task_keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://keycloak-mysql:3306/keycloak?useSSL=false&allowPublicKeyRetrieval=true
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: secret
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_BACKCHANNEL: false
+      KC_HTTP_ENABLED: true
+      KC_HTTP_PORT: 8080
+      KC_PROXY: edge
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/themes:/opt/keycloak/themes
+      - ./keycloak/import:/opt/keycloak/data/import
+    depends_on:
+      - keycloak-mysql
+    networks:
+      - task-network
+
+  # PHP-FPM for Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: task_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./laravel:/var/www:delegated
+      - vendor_data:/var/www/vendor
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - task-network
+    depends_on:
+      - mysql
+      - keycloak
+
+  # Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: task_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./laravel:/var/www:delegated
+      - vendor_data:/var/www/vendor # Nginx também precisa ver o vendor se houver assets
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - task-network
+    depends_on:
+      - app
+
+volumes:
+  mysql_data:
+  keycloak_mysql_data:
+  vendor_data: {}

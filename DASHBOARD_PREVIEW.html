@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Controller - Dashboard Preview</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 2rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            border: 1px solid #e2e8f0;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .color-box {
+            border-radius: 8px;
+            padding: 1.5rem;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .success {
+            background: #10b981;
+        }
+
+        .warning {
+            background: #f59e0b;
+        }
+
+        .danger {
+            background: #ef4444;
+        }
+
+        .info {
+            background: #0ea5e9;
+        }
+
+        .screenshot {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .screenshot img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.75rem 0;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list i {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge-planning {
+            background: #dbeafe;
+            color: #0369a1;
+        }
+
+        .badge-progress {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-done {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-paused {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .badge-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e11d48;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .before, .after {
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .before {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+        }
+
+        .after {
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+        }
+
+        .footer-note {
+            background: #f0f4f8;
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 2rem;
+            color: #475569;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h1>🎨 Task Controller Dashboard</h1>
+            <p class="subtitle">Design estratégico e moderno para controle de tarefas</p>
+            <p style="color: #94a3b8; font-size: 1rem;">
+                Desenvolvido por especialista em UX/UI e PHP • Rattes Factory
+            </p>
+        </div>
+
+        <!-- Seção de Visão Geral -->
+        <div class="card">
+            <h2>📋 Visão Geral do Projeto</h2>
+            <p>O novo dashboard foi desenvolvido com foco em três pilares:</p>
+            <ul class="feature-list" style="padding: 1rem 0;">
+                <li><i class="bi bi-palette"></i> <strong>Estética Moderna:</strong> Gradientes sofisticados, sombras suaves e tipografia escalada</li>
+                <li><i class="bi bi-speedometer2"></i> <strong>Experiência Estratégica:</strong> Métricas do dia em destaque com visualização clara</li>
+                <li><i class="bi bi-phone"></i> <strong>Responsividade Total:</strong> Desktop, tablet e mobile com experiência otimizada</li>
+            </ul>
+        </div>
+
+        <!-- Seção de Cores -->
+        <div class="card">
+            <h2>🎨 Paleta de Cores</h2>
+            <div class="color-grid">
+                <div class="color-box primary">
+                    Gradiente Primário<br>
+                    <code>#6366f1 → #764ba2</code>
+                </div>
+                <div class="color-box success">
+                    Sucesso / Concluído<br>
+                    <code>#10b981</code>
+                </div>
+                <div class="color-box warning">
+                    Aviso / Em Andamento<br>
+                    <code>#f59e0b</code>
+                </div>
+                <div class="color-box danger">
+                    Perigo / Cancelado<br>
+                    <code>#ef4444</code>
+                </div>
+                <div class="color-box info">
+                    Informação<br>
+                    <code>#0ea5e9</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Badges -->
+        <div class="card">
+            <h2>🏷️ Status de Tarefas</h2>
+            <p>Cada status tem uma cor visual para identificação rápida:</p>
+            <div style="margin-top: 1rem;">
+                <span class="badge badge-planning">Em Planejamento</span>
+                <span class="badge badge-progress">Em Andamento</span>
+                <span class="badge badge-done">Concluído</span>
+                <span class="badge badge-paused">Pausado</span>
+                <span class="badge badge-cancelled">Cancelado</span>
+            </div>
+        </div>
+
+        <!-- Estrutura Layout -->
+        <div class="card">
+            <h2>🏗️ Estrutura do Layout</h2>
+            <div class="grid" style="grid-template-columns: 1fr;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <p style="margin: 0; font-weight: 600;">📌 Header Moderno</p>
+                    <small>Logo do projeto + Nome do usuário + Botão logout</small>
+                </div>
+                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem;">
+                    <div style="background: white; border: 1px solid #e2e8f0; padding: 1rem; border-radius: 8px;">
+                        <p style="margin: 0; font-weight: 600; font-size: 0.9rem;">🔗 Sidebar</p>
+                        <small style="color: #64748b;">Menu de navegação<br>com links ativos</small>
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 1rem; border-radius: 8px;">
+                        <p style="margin: 0; font-weight: 600; font-size: 0.9rem;">📊 Conteúdo Principal</p>
+                        <small style="color: #64748b;">Cards de métricas e listas dinâmicas</small>
+                    </div>
+                </div>
+                <div style="background: white; border: 1px solid #e2e8f0; padding: 1.5rem; border-radius: 8px; margin-top: 1rem; text-align: center;">
+                    <p style="margin: 0; font-weight: 600; font-size: 0.9rem;">© Rattes Factory 2025</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Páginas -->
+        <div class="card">
+            <h2>📑 Páginas Disponíveis</h2>
+            <div class="grid">
+                <div class="stat-card">
+                    <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">📊 Dashboard</p>
+                    <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 0.9rem;">
+                        GET <code>/dashboard</code>
+                    </p>
+                    <ul style="list-style: none; padding: 1rem 0; margin: 0; font-size: 0.9rem; color: #64748b; border-top: 1px solid #e2e8f0; margin-top: 1rem; padding-top: 1rem;">
+                        <li>✓ 4 Cards de métricas</li>
+                        <li>✓ Tarefas do dia</li>
+                        <li>✓ Dica motivacional</li>
+                    </ul>
+                </div>
+                <div class="stat-card">
+                    <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">✓ Minhas Tarefas</p>
+                    <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 0.9rem;">
+                        GET <code>/tasks</code>
+                    </p>
+                    <ul style="list-style: none; padding: 1rem 0; margin: 0; font-size: 0.9rem; color: #64748b; border-top: 1px solid #e2e8f0; margin-top: 1rem; padding-top: 1rem;">
+                        <li>✓ Filtros avançados</li>
+                        <li>✓ Busca em tempo real</li>
+                        <li>✓ Estatísticas</li>
+                    </ul>
+                </div>
+                <div class="stat-card">
+                    <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">➕ Criar Tarefa</p>
+                    <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 0.9rem;">
+                        GET <code>/tasks/create</code>
+                    </p>
+                    <ul style="list-style: none; padding: 1rem 0; margin: 0; font-size: 0.9rem; color: #64748b; border-top: 1px solid #e2e8f0; margin-top: 1rem; padding-top: 1rem;">
+                        <li>✓ Formulário intuitivo</li>
+                        <li>✓ Validação client-side</li>
+                        <li>✓ Dicas contextuais</li>
+                    </ul>
+                </div>
+                <div class="stat-card">
+                    <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">✏️ Editar Tarefa</p>
+                    <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 0.9rem;">
+                        GET <code>/tasks/{id}/edit</code>
+                    </p>
+                    <ul style="list-style: none; padding: 1rem 0; margin: 0; font-size: 0.9rem; color: #64748b; border-top: 1px solid #e2e8f0; margin-top: 1rem; padding-top: 1rem;">
+                        <li>✓ Edição completa</li>
+                        <li>✓ Datas de criação</li>
+                        <li>✓ Opção de deletar</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Componentes -->
+        <div class="card">
+            <h2>🧩 Componentes Principais</h2>
+            <div style="margin-top: 1.5rem;">
+                <h3 style="color: #475569; margin-top: 1.5rem;">Cards Informativos</h3>
+                <p>Exibem métricas importantes com ícones e gradientes visuais.</p>
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 1rem;">
+                    <div class="stat-card">
+                        <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">
+                            <i class="bi bi-list-check" style="color: #667eea;"></i>
+                        </div>
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Total de Tarefas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">
+                            <i class="bi bi-hourglass-split" style="color: #f59e0b;"></i>
+                        </div>
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Em Andamento</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #10b981;">
+                        <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">
+                            <i class="bi bi-check-circle" style="color: #10b981;"></i>
+                        </div>
+                        <div class="stat-number" style="color: #10b981;">8</div>
+                        <div class="stat-label">Concluídas</div>
+                    </div>
+                </div>
+
+                <h3 style="color: #475569; margin-top: 2rem;">Listas de Tarefas</h3>
+                <p>Exibem tarefas com status visual e ações contextuais.</p>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid #e2e8f0;">
+                    <div style="display: flex; gap: 1rem; padding: 0.75rem; background: white; border-radius: 6px; border-left: 4px solid #667eea; align-items: flex-start;">
+                        <div style="width: 24px; height: 24px; border: 2px solid #e2e8f0; border-radius: 4px; flex-shrink: 0; margin-top: 2px;"></div>
+                        <div style="flex: 1;">
+                            <p style="margin: 0; color: #1e293b; font-weight: 600;">Implementar novo layout do dashboard</p>
+                            <span class="badge badge-progress">Em Andamento</span>
+                        </div>
+                        <a href="#" style="color: #667eea; text-decoration: none; font-weight: 600;">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recursos -->
+        <div class="card">
+            <h2>⚡ Recursos & Funcionalidades</h2>
+            <div class="grid">
+                <div>
+                    <h3 style="color: #475569; font-size: 1.1rem; margin-bottom: 1rem;">
+                        <i class="bi bi-search"></i> Busca & Filtros
+                    </h3>
+                    <ul class="feature-list">
+                        <li><i class="bi bi-funnel"></i> Filtro por status</li>
+                        <li><i class="bi bi-sort-down"></i> Ordenação customizável</li>
+                        <li><i class="bi bi-search"></i> Busca em tempo real</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #475569; font-size: 1.1rem; margin-bottom: 1rem;">
+                        <i class="bi bi-lightning"></i> Performance
+                    </h3>
+                    <ul class="feature-list">
+                        <li><i class="bi bi-zap"></i> Carregamento assíncrono</li>
+                        <li><i class="bi bi-clock-history"></i> Atualização a cada 30s</li>
+                        <li><i class="bi bi-hourglass-bottom"></i> Responsivo < 1s</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #475569; font-size: 1.1rem; margin-bottom: 1rem;">
+                        <i class="bi bi-palette"></i> Personalização
+                    </h3>
+                    <ul class="feature-list">
+                        <li><i class="bi bi-phone"></i> Responsivo 100%</li>
+                        <li><i class="bi bi-sunrise"></i> Cores customizáveis</li>
+                        <li><i class="bi bi-pencil"></i> Fácil edição</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #475569; font-size: 1.1rem; margin-bottom: 1rem;">
+                        <i class="bi bi-shield-check"></i> Validação
+                    </h3>
+                    <ul class="feature-list">
+                        <li><i class="bi bi-check-circle"></i> Validação client-side</li>
+                        <li><i class="bi bi-exclamation-circle"></i> Erros destacados</li>
+                        <li><i class="bi bi-info-circle"></i> Feedback imediato</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Antes e Depois -->
+        <div class="card">
+            <h2>🔄 Comparação: Antes vs Depois</h2>
+            <div class="comparison">
+                <div class="before">
+                    <h3 style="color: #7f1d1d; margin-bottom: 1rem;">❌ Antes</h3>
+                    <ul class="feature-list" style="padding: 0;">
+                        <li style="border: none;"><i class="bi bi-dash-circle"></i> Layout básico e monótono</li>
+                        <li style="border: none;"><i class="bi bi-dash-circle"></i> Header simples e sem destaque</li>
+                        <li style="border: none;"><i class="bi bi-dash-circle"></i> Sem sidebar de navegação</li>
+                        <li style="border: none;"><i class="bi bi-dash-circle"></i> Métricas não visíveis</li>
+                        <li style="border: none;"><i class="bi bi-dash-circle"></i> Design genérico</li>
+                    </ul>
+                </div>
+                <div class="after">
+                    <h3 style="color: #166534; margin-bottom: 1rem;">✅ Depois</h3>
+                    <ul class="feature-list" style="padding: 0;">
+                        <li style="border: none;"><i class="bi bi-check-circle"></i> Design moderno com gradientes</li>
+                        <li style="border: none;"><i class="bi bi-check-circle"></i> Header estilizado com logo</li>
+                        <li style="border: none;"><i class="bi bi-check-circle"></i> Sidebar com navegação clara</li>
+                        <li style="border: none;"><i class="bi bi-check-circle"></i> Dashboard estratégico</li>
+                        <li style="border: none;"><i class="bi bi-check-circle"></i> Branding profissional</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diferenciais -->
+        <div class="card">
+            <h2>🌟 Diferenciais do Design</h2>
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                <div style="background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+                    <h3 style="color: #0369a1; margin-top: 0;">✨ Gradientes Estratégicos</h3>
+                    <p style="margin-bottom: 0; color: #0c4a6e; font-size: 0.95rem;">
+                        Uso inteligente de cores em gradiente para transmitir modernidade e profissionalismo.
+                    </p>
+                </div>
+                <div style="background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #10b981;">
+                    <h3 style="color: #166534; margin-top: 0;">🎨 Hierarquia Visual</h3>
+                    <p style="margin-bottom: 0; color: #065f46; font-size: 0.95rem;">
+                        Tamanhos de fonte e pesos bem definidos para guiar o usuário naturalmente.
+                    </p>
+                </div>
+                <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                    <h3 style="color: #92400e; margin-top: 0;">📊 Micro-Interações</h3>
+                    <p style="margin-bottom: 0; color: #5a3800; font-size: 0.95rem;">
+                        Animações suaves que orientam sem distrair o usuário durante a navegação.
+                    </p>
+                </div>
+                <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ef4444;">
+                    <h3 style="color: #991b1b; margin-top: 0;">📱 Responsividade Total</h3>
+                    <p style="margin-bottom: 0; color: #7f1d1d; font-size: 0.95rem;">
+                        Experiência perfeita em desktop, tablet e mobile com adaptação automática.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Arquivos Criados -->
+        <div class="card">
+            <h2>📂 Arquivos Criados/Modificados</h2>
+            <div class="code-block">
+resources/views/
+├── layouts/
+│   └── app.blade.php                    [MODIFICADO]
+├── partials/
+│   ├── header.blade.php                 [NOVO]
+│   ├── sidebar.blade.php                [NOVO]
+│   └── footer.blade.php                 [NOVO]
+├── user/
+│   └── dashboard.blade.php              [MODIFICADO]
+└── tasks/
+    ├── index.blade.php                  [MODIFICADO]
+    ├── create.blade.php                 [MODIFICADO]
+    └── edit.blade.php                   [MODIFICADO]
+
+Documentação:
+└── DASHBOARD_DESIGN_GUIDE.md            [NOVO]
+            </div>
+        </div>
+
+        <!-- Próximos Passos -->
+        <div class="card">
+            <h2>🚀 Próximos Passos Recomendados</h2>
+            <div class="grid" style="grid-template-columns: 1fr;">
+                <div style="background: #f0f4f8; padding: 1.5rem; border-radius: 8px;">
+                    <h3 style="color: #1e293b; margin-top: 0; margin-bottom: 1rem;">1. Testabilidade</h3>
+                    <ul class="feature-list" style="padding: 0; border: none;">
+                        <li><i class="bi bi-terminal"></i> Testar em diferentes navegadores</li>
+                        <li><i class="bi bi-phone"></i> Verificar responsividade em mobile</li>
+                        <li><i class="bi bi-lightning"></i> Testar performance com muitas tarefas</li>
+                    </ul>
+                </div>
+                <div style="background: #f0f4f8; padding: 1.5rem; border-radius: 8px; margin-top: 1rem;">
+                    <h3 style="color: #1e293b; margin-top: 0; margin-bottom: 1rem;">2. Customizações Adicionais</h3>
+                    <ul class="feature-list" style="padding: 0; border: none;">
+                        <li><i class="bi bi-palette"></i> Alterar cores primárias conforme brand</li>
+                        <li><i class="bi bi-image"></i> Adicionar logo da empresa</li>
+                        <li><i class="bi bi-translate"></i> Adicionar tema escuro (dark mode)</li>
+                    </ul>
+                </div>
+                <div style="background: #f0f4f8; padding: 1.5rem; border-radius: 8px; margin-top: 1rem;">
+                    <h3 style="color: #1e293b; margin-top: 0; margin-bottom: 1rem;">3. Melhorias Futuras</h3>
+                    <ul class="feature-list" style="padding: 0; border: none;">
+                        <li><i class="bi bi-bar-chart"></i> Gráficos de produtividade</li>
+                        <li><i class="bi bi-bell"></i> Sistema de notificações</li>
+                        <li><i class="bi bi-cloud"></i> Sincronização em tempo real</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-note">
+            <p style="margin: 0; font-weight: 600;">
+                <i class="bi bi-heart-fill"></i> Desenvolvido com expertise em UX/UI e PHP
+            </p>
+            <p style="margin: 0.5rem 0 0 0;">
+                Design moderno • Acessível • Responsivo • Performance otimizado
+            </p>
+            <p style="margin: 1rem 0 0 0; color: #64748b; font-size: 0.9rem;">
+                © 2025 Rattes Factory • Todos os direitos reservados
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+
