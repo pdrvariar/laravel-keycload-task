@@ -108,8 +108,8 @@
 
                 if (!token) return;
 
-                // Carregar tarefas (como admin vê todas)
-                const tasksResponse = await fetch('/api/tasks', {
+                // Carregar tarefas (usando endpoint admin para ver TODAS as tarefas do sistema)
+                const tasksResponse = await fetch('/api/admin/tasks', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 

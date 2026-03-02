@@ -16,16 +16,20 @@ use App\Http\Controllers\Api\TaskController;
 
 // Rotas protegidas pelo guard 'api' (Keycloak)
 Route::middleware(['auth:api', 'validate.keycloak.token'])->group(function () {
-    // CRUD de Tarefas
-    Route::get('/tasks', [TaskController::class, 'index']);
+    // CRUD de Tarefas - MINHAS TAREFAS (sempre do usuário logado, mesmo para admins)
+    Route::get('/tasks', [TaskController::class, 'myTasks']);
     Route::post('/tasks', [TaskController::class, 'store']);
     Route::get('/tasks/{task}', [TaskController::class, 'show']);
     Route::put('/tasks/{task}', [TaskController::class, 'update']);
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
 
-    // Listar usuários (apenas para admins)
-    Route::get('/users', [TaskController::class, 'users']);
-
-    // Alias para admin (para manter consistência com o frontend)
+    // Rotas Admin - TODAS AS TAREFAS (apenas para admins)
+    Route::get('/admin/tasks', [TaskController::class, 'index']);
+    Route::get('/admin/tasks/{task}', [TaskController::class, 'show']);
+    Route::put('/admin/tasks/{task}', [TaskController::class, 'update']);
+    Route::delete('/admin/tasks/{task}', [TaskController::class, 'destroy']);
     Route::get('/admin/users', [TaskController::class, 'users']);
+
+    // Alias para backward compatibility
+    Route::get('/users', [TaskController::class, 'users']);
 });

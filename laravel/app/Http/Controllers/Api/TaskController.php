@@ -95,7 +95,44 @@ class TaskController extends Controller
     }
 
     /**
-     * Listar tarefas
+     * Listar MINHAS tarefas (sempre do usuário logado, mesmo para admins)
+     * Esta rota é usada em /tasks e deve sempre retornar apenas as tarefas do próprio usuário
+     */
+    public function myTasks(Request $request): JsonResponse
+    {
+        try {
+            [$user, $isAdmin] = $this->getUserAndRoles($request);
+
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Usuário não autenticado ou não encontrado no banco local.'], 401);
+            }
+
+            // SEMPRE filtra pelo usuário logado, mesmo se for admin
+            $query = Task::with('user')->where('user_id', $user->id);
+
+            // Filtro de status (se fornecido)
+            if ($request->has('status') && $request->input('status') !== '') {
+                $query->where('status', $request->input('status'));
+            }
+
+            // Ordenação
+            $sortBy = $request->input('sort_by', 'created_at');
+            $sortOrder = $request->input('sort_order', 'desc');
+            $query->orderBy($sortBy, $sortOrder);
+
+            return response()->json([
+                'success' => true,
+                'data' => $query->get(),
+                'is_admin' => $isAdmin,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erro ao listar minhas tarefas: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Erro ao carregar tarefas: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Listar tarefas (com filtros admin - usado em /admin/tasks)
      */
     public function index(Request $request): JsonResponse
     {

@@ -423,8 +423,25 @@
             });
     }
 
+    function updateStats(tasks) {
+        // Calcular estatísticas
+        const total = tasks.length;
+        const emAndamento = tasks.filter(t => t.status === 'Em Andamento').length;
+        const concluidas = tasks.filter(t => t.status === 'Concluído').length;
+        const pendentes = tasks.filter(t => t.status === 'Em Planejamento').length;
+
+        // Atualizar elementos no DOM
+        document.getElementById('stat-total').textContent = total;
+        document.getElementById('stat-progress').textContent = emAndamento;
+        document.getElementById('stat-completed').textContent = concluidas;
+        document.getElementById('stat-pending').textContent = pendentes;
+    }
+
     function renderTasks(tasks) {
         const container = document.getElementById('tasksContainer');
+
+        // Atualizar estatísticas
+        updateStats(tasks);
 
         if (tasks.length === 0) {
             container.innerHTML = `

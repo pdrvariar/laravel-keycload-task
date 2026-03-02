@@ -345,7 +345,7 @@
 <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
 
 <script>
-    const API_URL = '/api/tasks';
+    const API_URL = '/api/admin/tasks';
     const USERS_URL = '/api/users';
     const token = document.querySelector('meta[name="api-token"]')?.content;
 
