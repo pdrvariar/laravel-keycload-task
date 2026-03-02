@@ -140,6 +140,43 @@
             margin: 0;
         }
 
+        /* Badge de Role do Usuário - UX Profissional */
+        .user-role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.35rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-role-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-role-badge i {
+            font-size: 0.9rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
         .logout-btn {
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid rgba(255, 255, 255, 0.3);

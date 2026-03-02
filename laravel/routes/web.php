@@ -19,7 +19,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         $keycloakUser = session('keycloak_user') ?? [];
-        $roles = $keycloakUser['resource_access']['task-controller']['roles'] ?? [];
+        $clientId = config('keycloak.client_id', 'task-app');
+        $roles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
         if (in_array('admin', $roles)) {
             return redirect('/admin/dashboard');
         }
@@ -28,7 +29,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/dashboard', function () {
         $keycloakUser = session('keycloak_user') ?? [];
-        $roles = $keycloakUser['resource_access']['task-controller']['roles'] ?? [];
+        $clientId = config('keycloak.client_id', 'task-app');
+        $roles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
         abort_if(!in_array('admin', $roles), 403);
         return view('admin.dashboard');
     })->name('admin.dashboard');
@@ -49,7 +51,8 @@ Route::middleware('auth')->group(function () {
     // Rotas Admin para Tarefas
     Route::get('/admin/tasks', function () {
         $keycloakUser = session('keycloak_user') ?? [];
-        $roles = $keycloakUser['resource_access']['task-controller']['roles'] ?? [];
+        $clientId = config('keycloak.client_id', 'task-app');
+        $roles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
         abort_if(!in_array('admin', $roles), 403);
         return view('admin.tasks.index');
     })->name('admin.tasks.index');

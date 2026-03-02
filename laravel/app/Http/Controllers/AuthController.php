@@ -32,8 +32,28 @@ class AuthController extends Controller
 
             // Decode ID token to get user info
             $idToken = $tokenData['id_token'];
-            $parts = explode('.', $idToken);
-            $payload = json_decode(base64_decode($parts[1]), true);
+            $idTokenParts = explode('.', $idToken);
+            $idPayload = json_decode(base64_decode($idTokenParts[1]), true);
+
+            // Decode ACCESS token to get roles (roles are in access_token, not id_token)
+            $accessToken = $tokenData['access_token'];
+            $accessTokenParts = explode('.', $accessToken);
+            $accessPayload = json_decode(base64_decode($accessTokenParts[1]), true);
+
+            // Log detalhado do access_token
+            \Log::info('=== DEBUG ACCESS TOKEN ===');
+            \Log::info('Access Token Payload Completo:', $accessPayload);
+            \Log::info('Resource Access:', ['resource_access' => $accessPayload['resource_access'] ?? 'N/A']);
+            \Log::info('Realm Access:', ['realm_access' => $accessPayload['realm_access'] ?? 'N/A']);
+
+            // Merge payloads - user info from id_token, roles from access_token
+            $payload = array_merge($idPayload, [
+                'resource_access' => $accessPayload['resource_access'] ?? [],
+                'realm_access' => $accessPayload['realm_access'] ?? []
+            ]);
+
+            \Log::info('=== PAYLOAD FINAL MERGED ===');
+            \Log::info('Payload após merge:', $payload);
 
             // Find or create local user
             $user = \App\Models\User::updateOrCreate(
@@ -51,11 +71,19 @@ class AuthController extends Controller
                 'keycloak_user' => $payload,
             ]);
 
+            // Log para debug
+            \Log::info('Login - Roles encontradas', [
+                'email' => $payload['email'],
+                'resource_access' => $payload['resource_access'] ?? 'N/A',
+                'realm_access' => $payload['realm_access'] ?? 'N/A'
+            ]);
+
             // Log the user in (Laravel session)
             Auth::login($user, true);
 
             // Redirect based on role
-            $roles = $payload['resource_access']['task-controller']['roles'] ?? [];
+            $clientId = config('keycloak.client_id', 'task-app');
+            $roles = $payload['resource_access'][$clientId]['roles'] ?? [];
 
             if (in_array('admin', $roles)) {
                 return redirect('/admin/dashboard')->with('success', 'Bem-vindo de volta, Admin!');

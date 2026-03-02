@@ -4,7 +4,12 @@
         <ul class="sidebar-menu">
             <!-- Dashboard -->
             <li>
-                <a href="{{ auth()->check() && in_array('admin', session('keycloak_user.resource_access.task-controller.roles') ?? []) ? route('admin.dashboard') : route('dashboard') }}"
+                <?php
+                    $clientId = config('keycloak.client_id', 'task-app');
+                    $keycloakUser = session('keycloak_user', []);
+                    $userRoles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
+                ?>
+                <a href="{{ auth()->check() && in_array('admin', $userRoles) ? route('admin.dashboard') : route('dashboard') }}"
                    class="@if(request()->routeIs('dashboard') || request()->routeIs('admin.dashboard')) active @endif">
                     <i class="bi bi-speedometer2"></i>
                     <span>Dashboard</span>
@@ -30,7 +35,7 @@
             </li>
 
             <!-- Admin Menu (apenas para admins) -->
-            @if(in_array('admin', session('keycloak_user.resource_access.task-controller.roles') ?? []))
+            @if(in_array('admin', $userRoles))
                 <li style="margin-top: 2rem; padding: 0 1.5rem; color: #94a3b8; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">
                     ADMINISTRAÇÃO
                 </li>
