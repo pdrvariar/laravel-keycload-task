@@ -83,9 +83,11 @@ class AuthController extends Controller
 
             // Redirect based on role
             $clientId = config('keycloak.client_id', 'task-app');
-            $roles = $payload['resource_access'][$clientId]['roles'] ?? [];
+            $clientRoles = $payload['resource_access'][$clientId]['roles'] ?? [];
+            $realmRoles = $payload['realm_access']['roles'] ?? [];
+            $allRoles = array_merge($clientRoles, $realmRoles);
 
-            if (in_array('admin', $roles)) {
+            if (in_array('admin', $allRoles)) {
                 return redirect('/admin/dashboard')->with('success', 'Bem-vindo de volta, Admin!');
             }
 

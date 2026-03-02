@@ -20,8 +20,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         $keycloakUser = session('keycloak_user') ?? [];
         $clientId = config('keycloak.client_id', 'task-app');
-        $roles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
-        if (in_array('admin', $roles)) {
+        $clientRoles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
+        $realmRoles = $keycloakUser['realm_access']['roles'] ?? [];
+        $allRoles = array_merge($clientRoles, $realmRoles);
+
+        if (in_array('admin', $allRoles)) {
             return redirect('/admin/dashboard');
         }
         return view('user.dashboard');
@@ -30,8 +33,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', function () {
         $keycloakUser = session('keycloak_user') ?? [];
         $clientId = config('keycloak.client_id', 'task-app');
-        $roles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
-        abort_if(!in_array('admin', $roles), 403);
+        $clientRoles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
+        $realmRoles = $keycloakUser['realm_access']['roles'] ?? [];
+        $allRoles = array_merge($clientRoles, $realmRoles);
+
+        abort_if(!in_array('admin', $allRoles), 403);
         return view('admin.dashboard');
     })->name('admin.dashboard');
 
@@ -52,8 +58,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/tasks', function () {
         $keycloakUser = session('keycloak_user') ?? [];
         $clientId = config('keycloak.client_id', 'task-app');
-        $roles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
-        abort_if(!in_array('admin', $roles), 403);
+        $clientRoles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
+        $realmRoles = $keycloakUser['realm_access']['roles'] ?? [];
+        $allRoles = array_merge($clientRoles, $realmRoles);
+
+        abort_if(!in_array('admin', $allRoles), 403);
         return view('admin.tasks.index');
     })->name('admin.tasks.index');
 });

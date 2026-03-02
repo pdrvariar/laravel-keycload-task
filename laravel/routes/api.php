@@ -25,6 +25,7 @@ Route::middleware(['auth:api', 'validate.keycloak.token'])->group(function () {
 
     // Listar usuários (apenas para admins)
     Route::get('/users', [TaskController::class, 'users']);
+
+    // Alias para admin (para manter consistência com o frontend)
+    Route::get('/admin/users', [TaskController::class, 'users']);
 });
-
-

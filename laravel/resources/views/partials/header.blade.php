@@ -5,9 +5,11 @@
         <?php
             $clientId = config('keycloak.client_id', 'task-app');
             $keycloakUser = session('keycloak_user', []);
-            $headerRoles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
+            $clientRoles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
+            $realmRoles = $keycloakUser['realm_access']['roles'] ?? [];
+            $allRoles = array_merge($clientRoles, $realmRoles);
         ?>
-        <a href="{{ auth()->check() && in_array('admin', $headerRoles) ? route('admin.dashboard') : route('dashboard') }}"
+        <a href="{{ auth()->check() && in_array('admin', $allRoles) ? route('admin.dashboard') : route('dashboard') }}"
            class="header-brand" style="text-decoration: none; color: inherit; cursor: pointer;">
             <div class="header-brand-icon">
                 <i class="bi bi-list-check"></i>
@@ -28,19 +30,18 @@
                     <h3>{{ session('keycloak_user.name') ?? session('keycloak_user')['name'] ?? 'Usuário' }}</h3>
                     <p>{{ session('keycloak_user.email') ?? session('keycloak_user')['email'] ?? 'usuario@example.com' }}</p>
                     <?php
-                        // Reutilizar roles já obtidas no topo
-                        $roles = $headerRoles;
-
                         // Debug (remover após teste)
                         \Log::info('Header Debug', [
                             'keycloak_user_exists' => !is_null($keycloakUser),
                             'client_id' => $clientId ?? 'N/A',
                             'resource_access_keys' => is_array($keycloakUser) ? array_keys($keycloakUser['resource_access'] ?? []) : [],
-                            'roles_found' => $roles,
+                            'roles_found' => $allRoles,
                             'email' => $keycloakUser['email'] ?? 'N/A'
                         ]);
 
-                        $role = !empty($roles) ? strtolower($roles[0]) : 'user';
+                        // Verifica se é admin
+                        $isAdmin = in_array('admin', $allRoles);
+                        $role = $isAdmin ? 'admin' : 'user';
 
                         // Configuração de badge por role
                         $badgeConfig = [

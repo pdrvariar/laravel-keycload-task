@@ -7,7 +7,9 @@
                 <?php
                     $clientId = config('keycloak.client_id', 'task-app');
                     $keycloakUser = session('keycloak_user', []);
-                    $userRoles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
+                    $clientRoles = $keycloakUser['resource_access'][$clientId]['roles'] ?? [];
+                    $realmRoles = $keycloakUser['realm_access']['roles'] ?? [];
+                    $userRoles = array_merge($clientRoles, $realmRoles);
                 ?>
                 <a href="{{ auth()->check() && in_array('admin', $userRoles) ? route('admin.dashboard') : route('dashboard') }}"
                    class="@if(request()->routeIs('dashboard') || request()->routeIs('admin.dashboard')) active @endif">

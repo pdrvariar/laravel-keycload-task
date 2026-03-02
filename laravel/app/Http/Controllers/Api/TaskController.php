@@ -70,7 +70,9 @@ class TaskController extends Controller
         // Tentativa 1: Via método token() no user (comum em algumas libs)
         if (method_exists($request->user(), 'token')) {
             $token = $request->user()->token;
-             $roles = data_get((array)$token, 'resource_access.task-controller.roles', []);
+            $clientRoles = data_get((array)$token, 'resource_access.task-controller.roles', []);
+            $realmRoles = data_get((array)$token, 'realm_access.roles', []);
+            $roles = array_merge($clientRoles, $realmRoles);
         }
         // Tentativa 2: Decodificando o token do header (fallback manual)
         elseif ($bearerToken = $request->bearerToken()) {
@@ -78,7 +80,9 @@ class TaskController extends Controller
                 $tokenParts = explode('.', $bearerToken);
                 if (count($tokenParts) === 3) {
                     $payload = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $tokenParts[1]))), true);
-                    $roles = data_get($payload, 'resource_access.task-controller.roles', []);
+                    $clientRoles = data_get($payload, 'resource_access.task-controller.roles', []);
+                    $realmRoles = data_get($payload, 'realm_access.roles', []);
+                    $roles = array_merge($clientRoles, $realmRoles);
                 }
             } catch (\Exception $e) {
                 // Ignora erro de decode
