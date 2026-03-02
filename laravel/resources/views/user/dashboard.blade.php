@@ -126,6 +126,9 @@
     </div>
 
     <script>
+        // Variável para controlar múltiplos cliques simultâneos
+        let isUpdatingTask = false;
+
         // Carregar dados das tarefas via API
         async function loadTasks() {
             try {
@@ -209,11 +212,11 @@
 
             tasksList.innerHTML = tasks.map(task => `
                 <li class="task-item">
-                    <div class="task-checkbox ${task.status === 'Concluído' ? 'checked' : ''}">
+                    <div class="task-checkbox ${task.status === 'Concluído' ? 'checked' : ''}" onclick="toggleTaskStatus(${task.id})" style="cursor: pointer;" id="checkbox-${task.id}">
                         ${task.status === 'Concluído' ? '<i class="bi bi-check"></i>' : ''}
                     </div>
                     <div class="task-content">
-                        <p class="task-title" style="${task.status === 'Concluído' ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${task.description}</p>
+                        <p class="task-title" style="${task.status === 'Concluído' ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${task.title}</p>
                         <span class="task-status ${getStatusClass(task.status)}">${task.status}</span>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
@@ -223,6 +226,107 @@
                     </div>
                 </li>
             `).join('');
+        }
+
+        async function toggleTaskStatus(taskId) {
+            // Previnir múltiplos cliques simultâneos
+            if (isUpdatingTask) {
+                console.warn('Já existe uma atualização em progresso. Por favor aguarde...');
+                return;
+            }
+
+            isUpdatingTask = true;
+
+            // Feedback visual - mostrar loading no checkbox
+            const checkboxElement = document.getElementById(`checkbox-${taskId}`);
+            if (checkboxElement) {
+                checkboxElement.style.opacity = '0.5';
+                checkboxElement.style.pointerEvents = 'none';
+                checkboxElement.innerHTML = '<i class="bi bi-hourglass-split" style="animation: spin 1s linear infinite;"></i>';
+            }
+
+            console.log('toggleTaskStatus chamado para taskId:', taskId);
+
+            const token = document.querySelector('meta[name="api-token"]')?.content;
+
+            if (!token || token === 'null' || token === '') {
+                console.error('Token não encontrado');
+                alert('Erro: Token não encontrado. Recarregue a página.');
+                isUpdatingTask = false;
+                if (checkboxElement) {
+                    checkboxElement.style.opacity = '1';
+                    checkboxElement.style.pointerEvents = 'auto';
+                }
+                return;
+            }
+
+            try {
+                // Primeiro, buscar os dados atuais da tarefa
+                console.log('Buscando dados atuais da tarefa...');
+                const getResponse = await fetch(`/api/tasks/${taskId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!getResponse.ok) {
+                    throw new Error(`Erro ao buscar tarefa: ${getResponse.status}`);
+                }
+
+                const getData = await getResponse.json();
+                const task = getData.data;
+                console.log('Dados da tarefa:', task);
+
+                // Determinar o novo status
+                const newStatus = task.status === 'Concluído' ? 'Em Andamento' : 'Concluído';
+                console.log('Status atual:', task.status, '-> Novo status:', newStatus);
+
+                // Agora fazer o update com todos os dados
+                const payload = {
+                    title: task.title || '',
+                    description: task.description || '',
+                    status: newStatus
+                };
+
+                console.log('Enviando payload para atualizar:', payload);
+
+                const updateResponse = await fetch(`/api/tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const updateData = await updateResponse.json();
+                console.log('Resposta da atualização:', { status: updateResponse.status, data: updateData });
+
+                if (!updateResponse.ok) {
+                    console.error('Erro na atualização:', updateData);
+                    throw new Error(`Erro ao atualizar tarefa: ${updateResponse.status} - ${JSON.stringify(updateData)}`);
+                }
+
+                console.log('Tarefa atualizada com sucesso! Recarregando lista...');
+
+                // Aguardar um pouco antes de recarregar para garantir que o servidor processou
+                setTimeout(() => {
+                    loadTasks();
+                    isUpdatingTask = false;
+                }, 500);
+            } catch (error) {
+                console.error('Erro ao atualizar status da tarefa:', error);
+                alert('Erro ao atualizar tarefa: ' + error.message);
+                isUpdatingTask = false;
+                // Restaurar estado visual do checkbox em caso de erro
+                if (checkboxElement) {
+                    checkboxElement.style.opacity = '1';
+                    checkboxElement.style.pointerEvents = 'auto';
+                }
+            }
         }
 
         // Carregar tarefas quando a página carrega

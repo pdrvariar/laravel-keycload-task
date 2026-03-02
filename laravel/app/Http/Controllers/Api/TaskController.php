@@ -142,12 +142,14 @@ class TaskController extends Controller
             }
 
             $validated = $request->validate([
+                'title' => 'nullable|string|max:255',
                 'description' => 'required|string|max:1000',
                 'status' => 'nullable|in:Em Planejamento,Em Andamento,Concluído,Pausado,Cancelado',
             ]);
 
             $task = Task::create([
                 'user_id' => $user->id,
+                'title' => $validated['title'] ?? '(SEM TITULO)',
                 'description' => $validated['description'],
                 'status' => $validated['status'] ?? 'Em Planejamento',
             ]);
@@ -200,6 +202,7 @@ class TaskController extends Controller
             }
 
             $validated = $request->validate([
+                'title' => 'nullable|string|max:255',
                 'description' => 'required|string|max:1000',
                 'status' => 'required|in:Em Planejamento,Em Andamento,Concluído,Pausado,Cancelado',
             ]);

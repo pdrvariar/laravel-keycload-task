@@ -133,6 +133,11 @@
             <div class="modal-body">
                 <form id="taskForm">
                     <div class="mb-3">
+                        <label class="form-label fw-bold">Título</label>
+                        <input type="text" class="form-control" id="taskTitle" placeholder="Título da tarefa" maxlength="255">
+                        <small class="text-muted">Opcional - Máximo 255 caracteres</small>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label fw-bold">Descrição</label>
                         <textarea class="form-control" id="taskDescription" rows="4" placeholder="Descrição da tarefa"></textarea>
                         <small class="text-muted">Máximo 1000 caracteres</small>
@@ -446,6 +451,9 @@
                                     </button>
                                 </div>
                             </div>
+                            <h5 class="card-title mb-2" style="color: #1e293b; font-weight: 700;">
+                                <i class="bi bi-bookmark"></i> ${escapeHtml(task.title || '(SEM TITULO)')}
+                            </h5>
                             <p class="card-text text-wrap mb-3 flex-grow-1" style="word-break: break-word;">
                                 ${escapeHtml(task.description)}
                             </p>
@@ -471,6 +479,7 @@
             .then(data => {
                 if (data.success) {
                     const task = data.data;
+                    document.getElementById('taskTitle').value = task.title || '(SEM TITULO)';
                     document.getElementById('taskDescription').value = task.description;
                     document.getElementById('taskStatus').value = task.status;
                     document.getElementById('taskModalTitle').textContent = 'Editar Tarefa';
@@ -486,6 +495,7 @@
     }
 
     function saveTask() {
+        const title = document.getElementById('taskTitle').value.trim();
         const description = document.getElementById('taskDescription').value.trim();
         const status = document.getElementById('taskStatus').value;
 
@@ -501,6 +511,7 @@
             method: method,
             headers: getAuthHeaders(),
             body: JSON.stringify({
+                title: title || '(SEM TITULO)',
                 description: description,
                 status: status
             })

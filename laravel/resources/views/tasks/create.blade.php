@@ -20,6 +20,24 @@
         <!-- Formulário -->
         <div class="card-modern">
             <form id="createTaskForm">
+                <!-- Título -->
+                <div style="margin-bottom: 2rem;">
+                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; font-size: 0.95rem;">
+                        <i class="bi bi-bookmark"></i> Título da Tarefa
+                    </label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        placeholder="Digite o título da tarefa..."
+                        maxlength="255"
+                        style="width: 100%; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; font-family: inherit; transition: all 0.3s ease;"
+                        onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
+                        onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'"
+                    />
+                    <p style="color: #64748b; font-size: 0.85rem; margin-top: 0.5rem; margin-bottom: 0;">Opcional - Se deixar em branco, será definido como "(SEM TITULO)"</p>
+                </div>
+
                 <!-- Descrição -->
                 <div style="margin-bottom: 2rem;">
                     <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; font-size: 0.95rem;">
@@ -136,6 +154,7 @@
             e.preventDefault();
 
             const form = e.target;
+            const title = document.getElementById('title').value.trim();
             const description = document.getElementById('description').value;
             const status = document.getElementById('status').value;
 
@@ -154,6 +173,7 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
                     },
                     body: JSON.stringify({
+                        title: title || '(SEM TITULO)',
                         description,
                         status
                     })
